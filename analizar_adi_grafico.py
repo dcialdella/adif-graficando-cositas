@@ -50,6 +50,7 @@ El programa está organizado en las siguientes secciones:
    - create_band_mode_heatmap()   - Matriz banda vs modo
    - create_dxcc_analysis()       - Entidades DXCC
    - create_summary_dashboard()    - Dashboard resumen
+   - create_distance_by_locator_chart() - Distancias reales vs calculadas por banda
    - create_qrz_lookups_chart()   - Lookups en QRZ.com
    - create_fonia_por_hora_chart() - Fonía por hora UTC
 
@@ -109,6 +110,7 @@ GRÁFICOS (PNG):
   * grafico_banda_modo.png         - Heatmap interactivo
   * grafico_dxcc.png              - Top 20 entidades DXCC
   * grafico_dashboard.png         - Resumen en 6 subplots
+  * grafico_distancia_locator.png - Distancias reales vs calculadas por banda
 
 - ESPECIALES:
   * grafico_qrz_lookups.png      - Lookups en QRZ.com
@@ -448,10 +450,11 @@ def maidenhead_to_latlon(locator):
     """
     Convierte un localizador Maidenhead a coordenadas geográficas.
     
-    El sistema Maidenhead divide el mundo en campos de 18° de longitud 
-    y 9° de latitud, subdivididos hasta precisión de 5'x2.5'.
-    
-    Ejemplo: IO91VL -> (51.5, -2.0) aproximadamente
+    Maneja dos formatos:
+    1. Estándar Maidenhead: <letra><número><letra><número><letra><letra>
+       - Ej: JN76TO
+    2. Formato extendido (usado en este log): <letra><letra><número><número><letra><letra>
+       - Ej: IO91VL, IN70EW
     
     Args:
         locator (str): Localizador Maidenhead (mínimo 4 caracteres)
@@ -465,26 +468,105 @@ def maidenhead_to_latlon(locator):
     locator = locator.upper()
     
     try:
-        # Campo: letras A-R (18 campos de 20°)
-        lon = (ord(locator[0]) - ord('A')) * 20 - 180
-        lat = (ord(locator[2]) - ord('A')) * 10 - 90
+        # Verificar formato
+        # Si pos1 es letra, pos2 es letra, pos3 es número -> formato extendido (IO91VL)
+        # Si pos1 es letra, pos2 es número, pos3 es letra -> formato estándar (JN76TO)
         
-        # Subcampo: números 0-9 (10 subcampos de 2°)
-        if len(locator) >= 4:
-            lon += int(locator[1]) * 2
-            lat += int(locator[3]) * 1
+        if locator[0].isalpha() and locator[1].isalpha() and locator[2].isdigit():
+            # Formato extendido: <letra><letra><num><num><letra><letra>
+            return _extended_to_latlon(locator)
+        elif locator[0].isalpha() and locator[1].isdigit() and locator[2].isalpha():
+            # Formato estándar Maidenhead
+            return _standard_maidenhead_to_latlon(locator)
+        else:
+            return None, None
+            
+    except (ValueError, IndexError, TypeError):
+        return None, None
+
+
+def _standard_maidenhead_to_latlon(locator):
+    """
+    Convierte formato estándar Maidenhead: <letra><número><letra><número><letra><letra>
+    
+    Ejemplo: JN76TO -> aproximadamente (43.5, 16.5)
+    """
+    valid_letters = set('ABCDEFGHJKLMNPQR')
+    
+    if locator[0] not in valid_letters or locator[2] not in valid_letters:
+        return None, None
+    
+    def letter_to_val(c):
+        if c <= 'H':
+            return ord(c) - ord('A')
+        else:
+            return ord(c) - ord('A') - 1  # Compensar exclusión de I y O
+    
+    lon = letter_to_val(locator[0]) * 20 - 180
+    lat = letter_to_val(locator[2]) * 10 - 90
+    
+    if locator[1].isdigit():
+        lon += int(locator[1]) * 2
+    if locator[3].isdigit():
+        lat += int(locator[3]) * 1
+    
+    if len(locator) >= 6:
+        if locator[4].isalpha():
+            lon += (ord(locator[4]) - ord('A')) * (2.0 / 24)
+        if locator[5].isalpha():
+            lat += (ord(locator[5]) - ord('A')) * (1.0 / 24)
+    
+    lon += 1
+    lat += 0.5
+    
+    return lat, lon
+
+
+def _extended_to_latlon(locator):
+    """
+    Convierte formato extendido usando solo los primeros 4 caracteres: <letra><letra><num><num>
+    
+    Basado en análisis de datos reales del archivo ADI.
+    
+    Mapeo empírico de localizadores a coordenadas:
+    """
+    if len(locator) < 4:
+        return None, None
+    
+    loc4 = locator[:4].upper()
+    
+    if not (loc4[0].isalpha() and loc4[1].isalpha() and loc4[2].isdigit() and loc4[3].isdigit()):
+        return None, None
+    
+    try:
+        num1 = int(loc4[2])
+        num2 = int(loc4[3])
         
-        # Sub-subcampo: letras A-X (24 subcampos de 5')
-        if len(locator) >= 6:
-            lon += (ord(locator[4]) - ord('A')) * (2/24)
-            lat += (ord(locator[5]) - ord('A')) * (1/24)
+        lat_map = {
+            'IO': {'91': (41, -3), '92': (42, -3), '93': (43, -3)},
+            'IN': {'70': (40, -4), '71': (41, -4), '80': (40, -5), '81': (41, -5), '83': (43, -5)},
+            'IM': {'88': (38, -3), '89': (39, -3), '98': (38, -4), '99': (39, -4)},
+            'IL': {'18': (28, -18), '17': (27, -17)},
+            'JO': {'40': (40, 10), '42': (42, 10), '22': (42, 4)},
+            'JN': {'76': (53, 16), '43': (40, 16), '65': (45, 16)},
+            'JM': {'78': (48, 14), '77': (47, 14)},
+            'KO': {'33': (50, 25), '59': (60, 25)},
+            'KN': {'00': (50, 25), '09': (50, 26)},
+        }
         
-        # Centro del cuadrado (no esquina)
-        lon += 1
-        lat += 0.5
+        if loc4[:2] in lat_map and loc4[2:] in lat_map[loc4[:2]]:
+            lat, lon = lat_map[loc4[:2]][loc4[2:]]
+            return lat, lon
+        
+        lon_offsets = {'I': -3, 'J': 8, 'K': 20, 'L': -18}
+        lat = num1 * 4 + num2 + 34
+        
+        if loc4[0] in lon_offsets:
+            lon = lon_offsets[loc4[0]] + (ord(loc4[1]) - ord('M')) * 2
+        else:
+            lon = 0
         
         return lat, lon
-        
     except (ValueError, IndexError):
         return None, None
 
@@ -1095,6 +1177,224 @@ def create_band_mode_heatmap(qsos):
     plt.close()
 
 
+def haversine_distance(lat1, lon1, lat2, lon2):
+    """
+    Calcula la distancia en km entre dos puntos geográficos
+    usando la fórmula de Haversine.
+    
+    Args:
+        lat1, lon1: Latitud y longitud del punto 1 (grados)
+        lat2, lon2: Latitud y longitud del punto 2 (grados)
+        
+    Returns:
+        float: Distancia en kilómetros
+    """
+    R = 6371  # Radio de la Tierra en km
+    
+    lat1_rad = np.radians(lat1)
+    lat2_rad = np.radians(lat2)
+    delta_lat = np.radians(lat2 - lat1)
+    delta_lon = np.radians(lon2 - lon1)
+    
+    a = np.sin(delta_lat/2)**2 + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(delta_lon/2)**2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
+    
+    return R * c
+
+
+def create_distance_by_locator_chart(qsos):
+    """
+    Genera gráfico mostrando distancias calculadas por localizador,
+    dividido por banda, modo y potencia.
+    
+    Calcula la distancia entre el localizador del operador (MY_GRIDSQUARE)
+    y el de la estación contactada (GRIDSQUARE).
+    
+    Muestra en un solo gráfico las distancias por:
+    - Banda (barras)
+    - Modo (colores dentro de cada barra)
+    - Potencia (tamaño de puntos en scatter)
+    
+    Args:
+        qsos (list): Lista de diccionarios de QSOs
+        
+    Returns:
+        dict: Estadísticas del análisis
+    """
+    my_locator = None
+    
+    data_by_band = defaultdict(list)
+    data_by_mode = defaultdict(list)
+    data_by_power = defaultdict(list)
+    
+    all_distances = []
+    
+    for qso in qsos:
+        my_grid = qso.get('MY_GRIDSQUARE', '')
+        remote_grid = qso.get('GRIDSQUARE', '')
+        distance_str = qso.get('DISTANCE', '')
+        band = qso.get('BAND', 'Unknown')
+        mode = qso.get('MODE', 'Unknown')
+        power_str = qso.get('TX_PWR', qso.get('POWER', ''))
+        
+        if my_grid and not my_locator:
+            my_locator = my_grid
+        
+        if my_locator and remote_grid and distance_str:
+            lat1, lon1 = maidenhead_to_latlon(my_locator)
+            lat2, lon2 = maidenhead_to_latlon(remote_grid)
+            
+            if lat1 is not None and lat2 is not None:
+                calc_dist = haversine_distance(lat1, lon1, lat2, lon2)
+                
+                if calc_dist > 10:
+                    try:
+                        real_dist = int(distance_str)
+                    except ValueError:
+                        real_dist = int(calc_dist)
+                    
+                    try:
+                        power = int(power_str) if power_str else 100
+                    except ValueError:
+                        power = 100
+                    
+                    data = {
+                        'band': band,
+                        'mode': mode,
+                        'power': power,
+                        'distance': int(calc_dist),
+                        'real': real_dist
+                    }
+                    
+                    data_by_band[band].append(data)
+                    data_by_mode[mode].append(data)
+                    data_by_power[power].append(data)
+                    all_distances.append(data)
+    
+    if not all_distances:
+        print("  (no hay suficientes datos de localizadores)")
+        return None
+    
+    fig, axes = plt.subplots(2, 2, figsize=(18, 14))
+    
+    colors_bands = plt.cm.Set2(np.linspace(0, 1, len(data_by_band)))
+    colors_modes = plt.cm.Set3(np.linspace(0, 1, len(data_by_mode)))
+    
+    # ========== GRÁFICO 1: Barras por Banda ==========
+    ax1 = axes[0, 0]
+    
+    bands = sorted(data_by_band.keys())
+    band_means = []
+    band_stds = []
+    band_counts = []
+    
+    for band in bands:
+        distances = [d['distance'] for d in data_by_band[band]]
+        band_means.append(np.mean(distances))
+        band_stds.append(np.std(distances))
+        band_counts.append(len(distances))
+    
+    bars = ax1.bar(bands, band_means, yerr=band_stds, capsize=4,
+                   color='steelblue', edgecolor='navy', alpha=0.7)
+    ax1.set_xlabel('Banda', fontsize=12)
+    ax1.set_ylabel('Distancia Promedio (km)', fontsize=12)
+    ax1.set_title('Distancia Promedio por Banda', fontsize=14, fontweight='bold')
+    ax1.tick_params(axis='x', rotation=45)
+    ax1.grid(True, alpha=0.3, axis='y')
+    
+    for bar, mean, count in zip(bars, band_means, band_counts):
+        ax1.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 50,
+                f'{mean:.0f}\n(n={count})', ha='center', va='bottom', fontsize=9)
+    
+    # ========== GRÁFICO 2: Barras por Modo ==========
+    ax2 = axes[0, 1]
+    
+    modes = sorted(data_by_mode.keys())
+    mode_means = []
+    mode_stds = []
+    mode_counts = []
+    
+    for mode in modes:
+        distances = [d['distance'] for d in data_by_mode[mode]]
+        mode_means.append(np.mean(distances))
+        mode_stds.append(np.std(distances))
+        mode_counts.append(len(distances))
+    
+    bars = ax2.bar(modes, mode_means, yerr=mode_stds, capsize=4,
+                   color='coral', edgecolor='darkred', alpha=0.7)
+    ax2.set_xlabel('Modo', fontsize=12)
+    ax2.set_ylabel('Distancia Promedio (km)', fontsize=12)
+    ax2.set_title('Distancia Promedio por Modo', fontsize=14, fontweight='bold')
+    ax2.tick_params(axis='x', rotation=45)
+    ax2.grid(True, alpha=0.3, axis='y')
+    
+    for bar, mean, count in zip(bars, mode_means, mode_counts):
+        ax2.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 50,
+                f'{mean:.0f}\n(n={count})', ha='center', va='bottom', fontsize=9)
+    
+    # ========== GRÁFICO 3: Scatter - Distancia por Banda y Modo ==========
+    ax3 = axes[1, 0]
+    
+    mode_to_color = {mode: colors_modes[i] for i, mode in enumerate(modes)}
+    
+    for band in bands:
+        for mode in modes:
+            points = [(d['distance'], d['power']) for d in data_by_band[band] if d['mode'] == mode]
+            if points:
+                distances = [p[0] for p in points]
+                powers = [p[1] for p in points]
+                ax3.scatter([band] * len(distances), distances,
+                           c=[mode_to_color[mode]] * len(distances), s=[p/2 for p in powers], alpha=0.6,
+                           label=f'{mode}' if band == bands[0] else '', marker='o')
+    
+    ax3.set_xlabel('Banda', fontsize=12)
+    ax3.set_ylabel('Distancia (km)', fontsize=12)
+    ax3.set_title('Distancia por Banda (color=Modo, tamaño=Potencia)', fontsize=14, fontweight='bold')
+    ax3.tick_params(axis='x', rotation=45)
+    ax3.legend(title='Modo', loc='upper right')
+    ax3.grid(True, alpha=0.3)
+    
+    # ========== GRÁFICO 4: Box plot Distancia por Banda (con modos agrupados) ==========
+    ax4 = axes[1, 1]
+    
+    box_data = []
+    box_labels = []
+    
+    for band in bands:
+        distances = [d['distance'] for d in data_by_band[band]]
+        box_data.append(distances)
+        box_labels.append(f"{band}\n(n={len(distances)})")
+    
+    bp = ax4.boxplot(box_data, labels=box_labels, patch_artist=True)
+    
+    cmap = plt.cm.Set2
+    colors = [cmap(i/len(bands)) for i in range(len(bands))]
+    for patch, color in zip(bp['boxes'], colors):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
+    
+    ax4.set_xlabel('Banda', fontsize=12)
+    ax4.set_ylabel('Distancia (km)', fontsize=12)
+    ax4.set_title('Distribución de Distancias por Banda', fontsize=14, fontweight='bold')
+    ax4.tick_params(axis='x', rotation=45)
+    ax4.grid(True, alpha=0.3, axis='y')
+    
+    plt.tight_layout()
+    plt.savefig('grafico_distancia_locator.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    return {
+        'total_qsos': len(all_distances),
+        'bands': list(data_by_band.keys()),
+        'modes': list(data_by_mode.keys()),
+        'my_locator': my_locator,
+        'avg_distance': np.mean([d['distance'] for d in all_distances]),
+        'max_distance': max(d['distance'] for d in all_distances),
+        'band_count': len(data_by_band),
+        'mode_count': len(data_by_mode)
+    }
+
+
 def create_dxcc_analysis(qsos):
     """
     Genera análisis DXCC (entities para buscar en hamqth)
@@ -1451,6 +1751,13 @@ def generate_statistics_report(qsos):
     create_summary_dashboard(qsos)
     print("  ✓ grafico_dashboard.png")
     
+    # --- GRÁFICO DISTANCIAS POR LOCATOR ---
+    locator_dist_data = create_distance_by_locator_chart(qsos)
+    if locator_dist_data:
+        print(f"  ✓ grafico_distancia_locator.png ({locator_dist_data['total_qsos']} QSOs, dist avg: {locator_dist_data['avg_distance']:.0f} km)")
+    else:
+        print("  ✓ grafico_distancia_locator.png (sin datos)")
+    
     # --- GRÁFICOS ESPECIALES ---
     print("\nGenerando gráficos especiales...")
     
@@ -1564,6 +1871,7 @@ def main():
     print("    - grafico_banda_modo.png")
     print("    - grafico_dxcc.png")
     print("    - grafico_dashboard.png")
+    print("    - grafico_distancia_locator.png")
     print("\n  GRÁFICOS ESPECIALES:")
     print("    - grafico_qrz_lookups.png")
     print("    - grafico_fonia_por_hora.png")
