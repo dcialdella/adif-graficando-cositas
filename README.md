@@ -73,21 +73,6 @@ python analizar_por_operador.py
 │   ├── grafico_qrz_lookups.png      # Lookups en QRZ.com
 │   └── grafico_fonia_por_hora.png   # Fonía por hora UTC
 │
-└── GRÁFICOS ANÁLISIS POR OPERADOR (14):
-    ├── operador_resumen.png          # Comparativa total QSOs
-    ├── operador_bandas.png          # Bandas por operador (heatmap)
-    ├── operador_modos.png           # Modos por operador (heatmap)
-    ├── operador_horas.png           # Actividad horaria por operador
-    ├── operador_comparacion_bandas.png  # Barras agrupadas bandas
-    ├── operador_comparacion_modos.png   # Barras agrupadas modos
-    ├── operador_EA1JBW.png          # Detalle individual EA1JBW
-    ├── operador_EA3JAQ.png          # Detalle individual EA3JAQ
-    ├── operador_EA4GHH.png          # Detalle individual EA4GHH
-    ├── operador_EA4HUK.png          # Detalle individual EA4HUK
-    ├── operador_EA7GSP.png          # Detalle individual EA7GSP
-    ├── operador_EA7LDI.png          # Detalle individual EA7LDI
-    ├── operador_EA7LHS.png          # Detalle individual EA7LHS
-    └── operador_EB4GSN.png          # Detalle individual EB4GSN
 ```
 
 ---
@@ -220,71 +205,6 @@ Análisis específico de contactos en fonía (SSB/FM) por hora UTC.
 | QSOs en hora pico | 231 |
 
 ---
-
-## 👥 Script 2: Análisis por Operador (14 gráficos)
-
-Agrupa los contactos por el campo `OPERATOR` y genera estadísticas individuales y comparativas.
-
-### Operadores Encontrados
-
-| Operador | Total QSOs | Banda Favorita | Modo Favorito | Hora Pico |
-|----------|-----------|----------------|---------------|-----------|
-| **EA4HUK** | 742 | 40M (524) | SSB (570) | 11:00 UTC |
-| **EB4GSN** | 622 | 20M (347) | FT8 (543) | 07:00 UTC |
-| **EA7LDI** | 259 | 40M (219) | FT8 (144) | 18:00 UTC |
-| **EA7LHS** | 254 | 40M (107) | SSB (140) | 16:00 UTC |
-| **EA4GHH** | 240 | 40M (194) | SSB (125) | 10:00 UTC |
-| **EA3JAQ** | 113 | 20M (57) | SSB (59) | 20:00 UTC |
-| **EA1JBW** | 103 | 20M (84) | SSB (103) | 18:00 UTC |
-| **EA7GSP** | 18 | 70CM (18) | DIGITALVOICE (18) | 21:00 UTC |
-
-### Gráficos Comparativos
-
-#### Resumen por Operador
-![Resumen](operador_resumen.png)
-
-Total de QSOs y distribución porcentual por operador.
-
-#### Bandas por Operador
-![Bandas](operador_bandas.png)
-
-Heatmap y barras mostrando qué bandas usa cada operador.
-
-#### Modos por Operador
-![Modos](operador_modos.png)
-
-Análisis de modos por operador con heatmap.
-
-#### Actividad Horaria por Operador
-![Horas](operador_horas.png)
-
-Heatmap y líneas de tendencia horaria.
-
-#### Comparación de Bandas
-![Comparación Bandas](operador_comparacion_bandas.png)
-
-Barras agrupadas comparando bandas entre operadores.
-
-#### Comparación de Modos
-![Comparación Modos](operador_comparacion_modos.png)
-
-Barras agrupadas comparando modos entre operadores.
-
-### Gráficos Individuales (4 subplots cada uno)
-
-Cada operador tiene su propio gráfico con: Bandas, Modos (pastel), Actividad horaria, Días de la semana.
-
-| EA1JBW | EA3JAQ | EA4GHH |
-|--------|--------|--------|
-| ![EA1JBW](operador_EA1JBW.png) | ![EA3JAQ](operador_EA3JAQ.png) | ![EA4GHH](operador_EA4GHH.png) |
-
-| EA4HUK | EA7GSP | EA7LDI |
-|--------|--------|--------|
-| ![EA4HUK](operador_EA4HUK.png) | ![EA7GSP](operador_EA7GSP.png) | ![EA7LDI](operador_EA7LDI.png) |
-
-| EA7LHS | EB4GSN |
-|--------|--------|
-| ![EA7LHS](operador_EA7LHS.png) | ![EB4GSN](operador_EB4GSN.png) |
 
 ---
 
