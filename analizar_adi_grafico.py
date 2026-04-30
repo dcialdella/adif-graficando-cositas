@@ -979,6 +979,7 @@ def create_distance_histogram(qsos):
     ax2.set_ylabel('Número de QSOs', fontsize=12)
     ax2.set_title('Distribución de Distancias (Escala Log)', fontsize=14, fontweight='bold')
     ax2.set_xscale('log')
+    ax2.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x):,}'))
     
     plt.tight_layout()
     plt.savefig('grafico_distancias.png', dpi=300, bbox_inches='tight')
