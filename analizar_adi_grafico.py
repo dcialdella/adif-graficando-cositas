@@ -624,21 +624,27 @@ def create_countries_chart(countries_data, total_qsos):
         ax1.text(bar.get_x() + bar.get_width()/2., height + 0.5,
                 f'{count}', ha='center', va='bottom')
     
-    # Gráfico de pastel (top 10 + Otros)
-    top_10 = dict(list(countries_data.items())[:10])
-    others_count = sum(list(countries_data.values())[10:])
+    # Gráfico de pastel: incluir países hasta que "Otros" sea < 10%
+    all_values = list(countries_data.values())
+    total = sum(all_values)
+    cutoff = next(
+        (i for i in range(1, len(all_values)) if sum(all_values[i:]) / total < 0.10),
+        len(all_values)
+    )
+    top_n = dict(list(countries_data.items())[:cutoff])
+    others_count = sum(all_values[cutoff:])
     if others_count > 0:
-        top_10['Otros'] = others_count
-    
-    colors = plt.cm.Set3(np.linspace(0, 1, len(top_10)))
+        top_n['Otros'] = others_count
+
+    colors = plt.cm.tab20(np.linspace(0, 1, len(top_n)))
     wedges, texts, autotexts = ax2.pie(
-        top_10.values(), 
-        labels=top_10.keys(), 
-        autopct='%1.1f%%', 
-        colors=colors, 
+        top_n.values(),
+        labels=top_n.keys(),
+        autopct='%1.1f%%',
+        colors=colors,
         startangle=90
     )
-    ax2.set_title('Distribución por Países (Top 10)', fontsize=14, fontweight='bold')
+    ax2.set_title(f'Distribución por Países (Top {cutoff})', fontsize=14, fontweight='bold')
     
     plt.tight_layout()
     plt.savefig('grafico_paises.png', dpi=300, bbox_inches='tight')
