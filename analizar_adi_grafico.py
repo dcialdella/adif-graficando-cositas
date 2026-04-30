@@ -976,6 +976,7 @@ def create_distance_histogram(qsos):
             ax.text(0.5, 0.5, 'Sin datos', ha='center', va='center', transform=ax.transAxes)
         ax.set_xscale('log')
         ax.xaxis.set_major_formatter(fmt)
+        ax.xaxis.set_minor_formatter(fmt)
         ax.set_xlabel('Distancia (km)', fontsize=11)
         ax.set_ylabel('Número de QSOs', fontsize=11)
         ax.set_title(f'{title}\n(n={len(data)})', fontsize=12, fontweight='bold')
