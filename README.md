@@ -154,7 +154,7 @@ Progreso acumulado de contactos y QSOs por día.
 #### 12. Frecuencias Usadas
 ![Frecuencias](grafico_frecuencias.png)
 
-Histograma de frecuencias exactas en MHz.
+Histograma de frecuencias exactas en MHz, separado por modo de operación (múltiples subplots en un mismo PNG).
 
 #### 13. Potencia vs Distancia
 ![Potencia Distancia](grafico_potencia_distancia.png)

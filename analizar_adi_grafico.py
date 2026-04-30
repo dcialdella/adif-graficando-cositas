@@ -1062,31 +1062,50 @@ def create_timeline(qsos):
 
 def create_frequency_histogram(qsos):
     """
-    Genera histograma de frecuencias usadas.
+    Genera histograma de frecuencias usadas separado por modo de operación.
+    Muestra múltiples subplots en un solo archivo PNG.
     
     Args:
         qsos (list): Lista de diccionarios de QSOs
     """
-    frequencies = []
+    freq_by_mode = defaultdict(list)
+    
     for qso in qsos:
         freq = qso.get('FREQ', '')
+        mode = qso.get('MODE', 'Desconocido')
         if freq:
             try:
-                frequencies.append(float(freq))
+                freq_by_mode[mode].append(float(freq))
             except ValueError:
                 continue
     
-    if not frequencies:
+    if not freq_by_mode:
         print("  (no hay datos de frecuencia)")
         return
     
-    fig, ax = plt.subplots(figsize=(14, 6))
-    ax.hist(frequencies, bins=50, color='purple', edgecolor='darkviolet', alpha=0.7)
-    ax.set_xlabel('Frecuencia (MHz)', fontsize=12)
-    ax.set_ylabel('Número de QSOs', fontsize=12)
-    ax.set_title('Distribución de Frecuencias Usadas', fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.3, axis='y')
+    modes = list(freq_by_mode.keys())
+    n_modes = len(modes)
     
+    cols = 2
+    rows = (n_modes + cols - 1) // cols
+    
+    fig, axes = plt.subplots(rows, cols, figsize=(16, 5 * rows))
+    axes = axes.flatten() if n_modes > 1 else [axes]
+    
+    colors = plt.cm.Set2(np.linspace(0, 1, n_modes))
+    
+    for idx, (mode, freqs) in enumerate(freq_by_mode.items()):
+        ax = axes[idx]
+        ax.hist(freqs, bins=30, color=colors[idx], edgecolor='black', alpha=0.7)
+        ax.set_xlabel('Frecuencia (MHz)', fontsize=10)
+        ax.set_ylabel('Número de QSOs', fontsize=10)
+        ax.set_title(f'Modo: {mode} ({len(freqs)} QSOs)', fontsize=12, fontweight='bold')
+        ax.grid(True, alpha=0.3, axis='y')
+    
+    for idx in range(len(modes), len(axes)):
+        axes[idx].set_visible(False)
+    
+    plt.suptitle('Distribución de Frecuencias por Modo de Operación', fontsize=16, fontweight='bold', y=1.02)
     plt.tight_layout()
     plt.savefig('grafico_frecuencias.png', dpi=300, bbox_inches='tight')
     plt.close()
