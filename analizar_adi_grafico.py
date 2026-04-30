@@ -153,6 +153,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
+from prefijos_paises import PREFIJOS
 
 # ==============================================================================
 # CONFIGURACIÓN GLOBAL DE GRÁFICOS
@@ -249,9 +250,23 @@ def parse_adi_file(filename):
 # SECCIÓN 2: FUNCIONES DE ANÁLISIS
 # ==============================================================================
 
+def get_country_from_call(call):
+    """
+    Deriva el país a partir del prefijo del indicativo.
+    Usa el archivo prefijos_paises.py con la tabla ITU completa.
+    """
+    if not call:
+        return 'Desconocido'
+    call = call.upper().strip()
+    for prefix, country in PREFIJOS:
+        if call.startswith(prefix):
+            return country
+    return 'Desconocido'
+
 def analyze_countries(qsos):
     """
     Cuenta QSOs por país.
+    Si el campo COUNTRY está vacío, deriva el país del prefijo del indicativo.
     
     Args:
         qsos (list): Lista de diccionarios de QSOs
@@ -262,7 +277,12 @@ def analyze_countries(qsos):
     countries = Counter()
     
     for qso in qsos:
-        country = qso.get('COUNTRY', 'Desconocido')
+        country = qso.get('COUNTRY', '')
+        
+        if not country or country.strip() == '':
+            call = qso.get('CALL', '')
+            country = get_country_from_call(call)
+        
         if country:
             countries[country] += 1
     
