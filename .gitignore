@@ -1,0 +1,13 @@
+# Logs ADIF (datos personales)
+*.adi
+*.adif
+
+# Entorno virtual
+venv_adi/
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
