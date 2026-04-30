@@ -932,60 +932,60 @@ def create_heatmap_day_hour(qsos):
 
 
 def create_distance_histogram(qsos):
-    """
-    Genera histograma de distancias de los contactos.
-    
-    Muestra distribución lineal y logarítmica para ver tanto
-    contactos locales como DX.
-    
-    Args:
-        qsos (list): Lista de diccionarios de QSOs
-        
-    Returns:
-        list: Lista de distancias en km (o None si no hay datos)
-    """
-    distances = []
+    FONIA   = {'SSB', 'FM', 'AM', 'PHONE', 'USB', 'LSB'}
+    DIGITAL = {'FT8', 'FT4', 'FT2', 'RTTY', 'PSK31', 'PSK63', 'MFSK', 'JS8', 'DIGITALVOICE'}
+
+    all_dist, fonia_dist, digital_dist = [], [], []
     for qso in qsos:
         dist = qso.get('DISTANCE', '')
-        if dist:
-            try:
-                distances.append(int(dist))
-            except ValueError:
-                continue
-    
-    if not distances:
+        if not dist:
+            continue
+        try:
+            d = int(dist)
+        except ValueError:
+            continue
+        mode = qso.get('MODE', '').upper()
+        all_dist.append(d)
+        if mode in FONIA:
+            fonia_dist.append(d)
+        elif mode in DIGITAL:
+            digital_dist.append(d)
+
+    if not all_dist:
         print("  (no hay datos de distancia)")
         return None
-    
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
-    
-    # Histograma lineal
-    ax1.hist(distances, bins=30, color='steelblue', edgecolor='navy', alpha=0.7)
-    ax1.set_xlabel('Distancia (km)', fontsize=12)
-    ax1.set_ylabel('Número de QSOs', fontsize=12)
-    ax1.set_title('Distribución de Distancias', fontsize=14, fontweight='bold')
-    ax1.axvline(np.mean(distances), color='red', linestyle='--', 
-                label=f'Media: {np.mean(distances):.0f} km')
-    ax1.legend()
-    
-    # Histograma logarítmico (muestra mejor DX)
-    log_bins = np.logspace(
-        np.log10(max(1, min(distances))), 
-        np.log10(max(distances) + 1), 
-        20
-    )
-    ax2.hist(distances, bins=log_bins, color='coral', edgecolor='darkred', alpha=0.7)
-    ax2.set_xlabel('Distancia (km) - Escala logarítmica', fontsize=12)
-    ax2.set_ylabel('Número de QSOs', fontsize=12)
-    ax2.set_title('Distribución de Distancias (Escala Log)', fontsize=14, fontweight='bold')
-    ax2.set_xscale('log')
-    ax2.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x):,}'))
-    
+
+    def log_bins(data):
+        return np.logspace(np.log10(max(1, min(data))), np.log10(max(data) + 1), 25)
+
+    fmt = plt.FuncFormatter(lambda x, _: f'{int(x):,}')
+
+    fig, axes = plt.subplots(1, 3, figsize=(20, 6))
+
+    for ax, data, title, color in [
+        (axes[0], all_dist,     'Todos los modos',          'steelblue'),
+        (axes[1], fonia_dist,   'Fonía (SSB / FM / AM)',    'coral'),
+        (axes[2], digital_dist, 'Digital (FT8/FT4/RTTY…)',  'mediumseagreen'),
+    ]:
+        if data:
+            ax.hist(data, bins=log_bins(data), color=color, edgecolor='black', alpha=0.7)
+            ax.axvline(np.mean(data), color='red', linestyle='--',
+                       label=f'Media: {np.mean(data):.0f} km')
+            ax.legend(fontsize=9)
+        else:
+            ax.text(0.5, 0.5, 'Sin datos', ha='center', va='center', transform=ax.transAxes)
+        ax.set_xscale('log')
+        ax.xaxis.set_major_formatter(fmt)
+        ax.set_xlabel('Distancia (km)', fontsize=11)
+        ax.set_ylabel('Número de QSOs', fontsize=11)
+        ax.set_title(f'{title}\n(n={len(data)})', fontsize=12, fontweight='bold')
+        ax.tick_params(axis='x', rotation=30)
+
+    plt.suptitle('Distribución de Distancias por Tipo de Modo', fontsize=14, fontweight='bold')
     plt.tight_layout()
     plt.savefig('grafico_distancias.png', dpi=300, bbox_inches='tight')
     plt.close()
-    
-    return distances
+    return all_dist
 
 
 def create_zones_chart(qsos):
