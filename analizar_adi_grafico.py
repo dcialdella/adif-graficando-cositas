@@ -960,13 +960,15 @@ def create_distance_histogram(qsos):
 
     fmt = plt.FuncFormatter(lambda x, _: f'{int(x):,}')
 
-    fig, axes = plt.subplots(1, 3, figsize=(20, 6))
+    fig, axes = plt.subplots(1, 4, figsize=(26, 6))
 
-    for ax, data, title, color in [
-        (axes[0], all_dist,     'Todos los modos',          'steelblue'),
-        (axes[1], fonia_dist,   'Fonía (SSB / FM / AM)',    'coral'),
-        (axes[2], digital_dist, 'Digital (FT8/FT4/RTTY…)',  'mediumseagreen'),
-    ]:
+    datasets = [
+        (all_dist,     'Todos los modos',         'steelblue'),
+        (fonia_dist,   'Fonía (SSB / FM / AM)',   'coral'),
+        (digital_dist, 'Digital (FT8/FT4/RTTY…)', 'mediumseagreen'),
+    ]
+
+    for ax, (data, title, color) in zip(axes[:3], datasets):
         if data:
             ax.hist(data, bins=log_bins(data), color=color, edgecolor='black', alpha=0.7)
             ax.axvline(np.mean(data), color='red', linestyle='--',
@@ -981,6 +983,30 @@ def create_distance_histogram(qsos):
         ax.set_ylabel('Número de QSOs', fontsize=11)
         ax.set_title(f'{title}\n(n={len(data)})', fontsize=12, fontweight='bold')
         ax.tick_params(axis='x', rotation=30)
+
+    # 4º subplot: media vs máxima por grupo
+    ax4 = axes[3]
+    labels  = ['Todos', 'Fonía', 'Digital']
+    colors4 = ['steelblue', 'coral', 'mediumseagreen']
+    groups  = [all_dist, fonia_dist, digital_dist]
+    medias  = [int(np.mean(d)) if d else 0 for d in groups]
+    maximas = [max(d) if d else 0 for d in groups]
+
+    x = np.arange(len(labels))
+    width = 0.35
+    ax4.bar(x - width/2, medias,  width, label='Media',  color=colors4, alpha=0.8, edgecolor='black')
+    ax4.bar(x + width/2, maximas, width, label='Máxima', color=colors4, alpha=0.4, edgecolor='black', hatch='//')
+
+    for i, (m, mx) in enumerate(zip(medias, maximas)):
+        ax4.text(i - width/2, m  + 30, f'{m:,}',  ha='center', va='bottom', fontsize=8)
+        ax4.text(i + width/2, mx + 30, f'{mx:,}', ha='center', va='bottom', fontsize=8)
+
+    ax4.set_xticks(x)
+    ax4.set_xticklabels(labels)
+    ax4.set_ylabel('Distancia (km)')
+    ax4.set_title('Media vs Máxima\npor tipo de modo', fontsize=12, fontweight='bold')
+    ax4.legend(fontsize=9)
+    ax4.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{int(v):,}'))
 
     plt.suptitle('Distribución de Distancias por Tipo de Modo', fontsize=14, fontweight='bold')
     plt.tight_layout()
