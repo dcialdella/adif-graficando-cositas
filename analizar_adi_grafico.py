@@ -165,6 +165,506 @@ plt.rcParams["axes.grid"] = True
 
 
 # ==============================================================================
+# MAPA DE PREFIJOS DE INDICATIVOS A PAÍSES (ITU Prefix Allocation)
+# ==============================================================================
+
+PREFIX_COUNTRY_MAP = {
+    # España y dependencias
+    "EA": "Spain", "EB": "Spain", "EC": "Spain", "ED": "Spain",
+    "EE": "Spain", "EF": "Spain", "EG": "Spain", "EH": "Spain",
+    # Canarias (EA8) se considera Spain, aunque algunos logs lo separan
+    # Baleares (EA6) es Spain
+    # Ceuta/Melilla (EA9) es Spain
+    # Portugal
+    "CT": "Portugal", "CS": "Portugal",
+    # Francia
+    "F": "France", "FG": "France", "FH": "France", "FJ": "France",
+    "FK": "France", "FM": "France", "FO": "France", "FP": "France",
+    "FR": "France", "FT": "France", "FW": "France", "FY": "France",
+    # Alemania
+    "DA": "Germany", "DB": "Germany", "DC": "Germany", "DD": "Germany",
+    "DE": "Germany", "DF": "Germany", "DG": "Germany", "DH": "Germany",
+    "DI": "Germany", "DJ": "Germany", "DK": "Germany", "DL": "Germany",
+    "DM": "Germany", "DN": "Germany", "DO": "Germany", "DP": "Germany",
+    "DQ": "Germany", "DR": "Germany", "DS": "Germany", "DT": "Germany",
+    "DU": "Germany",
+    # Reino Unido / Inglaterra
+    "G": "England", "M": "England", "2E": "England",
+    "MM": "Scotland", "GM": "Scotland",
+    "GI": "Northern Ireland", "MI": "Northern Ireland",
+    "GJ": "Jersey", "G": "England",
+    "GU": "Guernsey", "GG": "Guernsey",
+    "GD": "Isle of Man", "MD": "Isle of Man",
+    "GW": "Wales", "MW": "Wales",
+    # Italia
+    "I": "Italy", "IK": "Italy", "IZ": "Italy", "IU": "Italy",
+    "IW": "Italy", "IN": "Italy", "IQ": "Italy", "IR": "Italy",
+    "IS": "Italy", "IT": "Italy", "IV": "Italy",
+    # Bélgica
+    "ON": "Belgium", "OR": "Belgium",
+    # Países Bajos
+    "PA": "Netherlands", "PB": "Netherlands", "PC": "Netherlands",
+    "PD": "Netherlands", "PE": "Netherlands", "PF": "Netherlands",
+    "PG": "Netherlands", "PH": "Netherlands", "PI": "Netherlands",
+    "PJ": "Netherlands",
+    # Austria
+    "OE": "Austria",
+    # República Checa
+    "OK": "Czech Republic", "OL": "Czech Republic",
+    # Eslovaquia
+    "OM": "Slovakia",
+    # Polonia
+    "SP": "Poland", "SQ": "Poland", "SR": "Poland",
+    # Bulgaria
+    "LZ": "Bulgaria",
+    # Croacia
+    "9A": "Croatia",
+    # Hungría
+    "HA": "Hungary", "HG": "Hungary",
+    # Eslovenia
+    "S5": "Slovenia",
+    # Dinamarca
+    "OZ": "Denmark", "OU": "Denmark", "OV": "Denmark", "OW": "Denmark",
+    "OX": "Denmark",
+    # Islandia
+    "TF": "Iceland",
+    # Ucrania
+    "UR": "Ukraine", "UT": "Ukraine", "UU": "Ukraine",
+    "UY": "Ukraine", "UZ": "Ukraine", "EM": "Ukraine",
+    "EO": "Ukraine",
+    # Grecia
+    "SV": "Greece", "SY": "Greece",
+    # Irlanda
+    "EI": "Ireland", "EJ": "Ireland",
+    # Andorra
+    "C3": "Andorra",
+    # Malta
+    "9H": "Malta",
+    # Turquía
+    "TA": "Turkey", "TB": "Turkey", "TC": "Turkey",
+    # Belice
+    "V3": "Belize",
+    # Suiza
+    "HB": "Switzerland", "HE": "Switzerland",
+    # Luxemburgo
+    "LX": "Luxembourg",
+    # Noruega
+    "LA": "Norway", "LB": "Norway", "LC": "Norway", "LD": "Norway",
+    "LE": "Norway", "LF": "Norway", "LG": "Norway", "LH": "Norway",
+    "LI": "Norway", "LJ": "Norway", "LK": "Norway", "LL": "Norway",
+    # Suecia
+    "SM": "Sweden", "SK": "Sweden", "SA": "Sweden", "SB": "Sweden",
+    "SC": "Sweden", "SD": "Sweden", "SE": "Sweden", "SF": "Sweden",
+    "SG": "Sweden", "SH": "Sweden", "SI": "Sweden", "SJ": "Sweden",
+    "SL": "Sweden",
+    # Finlandia
+    "OH": "Finland", "OI": "Finland", "OJ": "Finland",
+    # Rumanía
+    "YO": "Romania", "YR": "Romania",
+    # Serbia
+    "YU": "Serbia", "YT": "Serbia", "YZ": "Serbia",
+    # Bosnia y Herzegovina
+    "E7": "Bosnia and Herzegovina",
+    # Bielorrusia
+    "EW": "Belarus",
+    # Moldavia
+    "ER": "Moldova",
+    # Lituania
+    "LY": "Lithuania",
+    # Letonia
+    "YL": "Latvia",
+    # Estonia
+    "ES": "Estonia",
+    # Japón
+    "JA": "Japan", "JH": "Japan", "JI": "Japan", "JJ": "Japan",
+    "JK": "Japan", "JL": "Japan", "JM": "Japan", "JN": "Japan",
+    "JO": "Japan", "JP": "Japan", "JR": "Japan", "JS": "Japan",
+    "JT": "Japan",
+    # Brasil
+    "PY": "Brazil", "PT": "Brazil", "PU": "Brazil", "PV": "Brazil",
+    # Estados Unidos
+    "K": "United States", "N": "United States", "W": "United States",
+    "AA": "United States", "AB": "United States", "AC": "United States",
+    "AD": "United States", "AE": "United States", "AF": "United States",
+    "AG": "United States", "AH": "United States", "AI": "United States",
+    "AJ": "United States", "AK": "United States", "AL": "United States",
+    "KA": "United States", "KB": "United States", "KC": "United States",
+    "KD": "United States", "KE": "United States", "KF": "United States",
+    "KG": "United States", "KH": "United States", "KI": "United States",
+    "KJ": "United States", "KK": "United States", "KL": "United States",
+    "KM": "United States", "KN": "United States", "KO": "United States",
+    "KP": "United States", "KQ": "United States", "KR": "United States",
+    "KS": "United States", "KT": "United States", "KU": "United States",
+    "KV": "United States", "KW": "United States", "KX": "United States",
+    "KY": "United States", "KZ": "United States",
+    "NA": "United States", "NB": "United States", "NC": "United States",
+    "ND": "United States", "NE": "United States", "NF": "United States",
+    "NG": "United States", "NH": "United States", "NI": "United States",
+    "NJ": "United States", "NK": "United States", "NL": "United States",
+    "NM": "United States", "NN": "United States", "NO": "United States",
+    "NP": "United States", "NQ": "United States", "NR": "United States",
+    "NS": "United States", "NT": "United States", "NU": "United States",
+    "NV": "United States", "NW": "United States", "NX": "United States",
+    "NY": "United States", "NZ": "United States",
+    "WA": "United States", "WB": "United States", "WC": "United States",
+    "WD": "United States", "WE": "United States", "WF": "United States",
+    "WG": "United States", "WH": "United States", "WI": "United States",
+    "WJ": "United States", "WK": "United States", "WL": "United States",
+    "WM": "United States", "WN": "United States", "WO": "United States",
+    "WP": "United States", "WQ": "United States", "WR": "United States",
+    "WS": "United States", "WT": "United States", "WU": "United States",
+    "WV": "United States", "WW": "United States", "WX": "United States",
+    "WY": "United States", "WZ": "United States",
+    # Puerto Rico (USA)
+    "KP3": "United States", "KP4": "United States", "NP3": "United States", "NP4": "United States",
+    # Canadá
+    "VA": "Canada", "VB": "Canada", "VC": "Canada", "VD": "Canada",
+    "VE": "Canada", "VF": "Canada", "VG": "Canada", "VH": "Canada",
+    "VI": "Canada", "VJ": "Canada", "VK": "Canada", "VL": "Canada",
+    "VM": "Canada", "VN": "Canada", "VO": "Canada", "VP": "Canada",
+    "VQ": "Canada", "VR": "Canada", "VS": "Canada", "VT": "Canada",
+    "VU": "Canada", "VV": "Canada", "VW": "Canada", "VX": "Canada",
+    "VY": "Canada",
+    # Rusia
+    "R": "Russia", "RA": "Russia", "RB": "Russia", "RC": "Russia",
+    "RD": "Russia", "RE": "Russia", "RF": "Russia", "RG": "Russia",
+    "RH": "Russia", "RI": "Russia", "RJ": "Russia", "RK": "Russia",
+    "RL": "Russia", "RM": "Russia", "RN": "Russia", "RO": "Russia",
+    "RP": "Russia", "RQ": "Russia", "RR": "Russia", "RS": "Russia",
+    "RT": "Russia", "RU": "Russia", "RV": "Russia", "RW": "Russia",
+    "RX": "Russia", "RY": "Russia", "RZ": "Russia",
+    "UA": "Russia", "UB": "Russia", "UC": "Russia", "UD": "Russia",
+    "UE": "Russia", "UF": "Russia", "UG": "Russia", "UH": "Russia",
+    "UI": "Russia",
+    # Rusia Asiática (algunos logs separan)
+    "R0": "Russia", "RA0": "Russia",
+    "UA0": "Russia", "UA9": "Russia",
+    "RI0": "Russia",
+    # Túnez
+    "3V": "Tunisia",
+    # Chipre
+    "5B": "Cyprus",
+    # Marruecos
+    "CN": "Morocco",
+    # Egipto
+    "SU": "Egypt",
+    # Sudáfrica
+    "ZS": "South Africa", "ZT": "South Africa", "ZU": "South Africa",
+    # Australia
+    "VK": "Australia", "VI": "Australia",
+    # Nueva Zelanda
+    "ZL": "New Zealand", "ZM": "New Zealand",
+    # Indonesia
+    "YB": "Indonesia", "YC": "Indonesia", "YD": "Indonesia",
+    "YE": "Indonesia", "YF": "Indonesia", "YG": "Indonesia",
+    # Filipinas
+    "DU": "Philippines", "DV": "Philippines", "DW": "Philippines",
+    "DX": "Philippines",
+    # Israel
+    "4X": "Israel", "4Z": "Israel",
+    # EAU
+    "A6": "United Arab Emirates",
+    # Qatar
+    "A7": "Qatar",
+    # Baréin
+    "A9": "Bahrain",
+    # Arabia Saudí
+    "HZ": "Saudi Arabia", "7Z": "Saudi Arabia",
+    # Kirguistán
+    "EX": "Kyrgyzstan",
+    # Armenia
+    "EK": "Armenia",
+    # Uzbekistán
+    "UK": "Uzbekistan",
+    # Kazajistán
+    "UN": "Kazakhstan",
+    # Tayikistán
+    "EY": "Tajikistan",
+    # Turkmenistán
+    "EZ": "Turkmenistan",
+    # Madagascar
+    "5R": "Madagascar",
+    # Ruanda
+    "9X": "Rwanda",
+    # República Dominicana
+    "HI": "Dominican Republic",
+    # Panamá
+    "HP": "Panama",
+    # Cuba
+    "CM": "Cuba", "CO": "Cuba", "CL": "Cuba",
+    # Argentina
+    "LU": "Argentina", "LV": "Argentina", "LW": "Argentina",
+    # Uruguay
+    "CX": "Uruguay",
+    # Chile
+    "CA": "Chile", "CB": "Chile", "CC": "Chile", "CD": "Chile",
+    "CE": "Chile", "CF": "Chile", "CG": "Chile", "CH": "Chile",
+    "CI": "Chile", "CJ": "Chile", "CK": "Chile", "CL": "Chile",
+    # Perú
+    "OA": "Peru", "OB": "Peru", "OC": "Peru", "OE": "Peru",
+    # Ecuador
+    "HC": "Ecuador", "HD": "Ecuador",
+    # Venezuela
+    "YV": "Venezuela", "YW": "Venezuela", "YX": "Venezuela",
+    "YY": "Venezuela", "YZ": "Venezuela",
+    # Colombia
+    "HJ": "Colombia", "HK": "Colombia",
+    # México
+    "XA": "Mexico", "XB": "Mexico", "XC": "Mexico", "XD": "Mexico",
+    "XE": "Mexico", "XF": "Mexico", "XG": "Mexico", "XH": "Mexico",
+    "XI": "Mexico",
+    # Gibraltar
+    "ZB": "Gibraltar", "ZD": "Gibraltar",
+    # India
+    "VU": "India",
+    # China
+    "BA": "China", "BB": "China", "BC": "China", "BD": "China",
+    "BE": "China", "BF": "China", "BG": "China", "BH": "China",
+    "BI": "China", "BJ": "China", "BK": "China", "BL": "China",
+    "BM": "China", "BN": "China", "BO": "China", "BP": "China",
+    "BQ": "China", "BR": "China", "BS": "China", "BT": "China",
+    # Hong Kong
+    "VR": "Hong Kong",
+    # Macao
+    "XX": "Macao",
+    # Taiwán
+    "BV": "Taiwan",
+    # Corea del Sur
+    "HL": "South Korea", "HM": "South Korea",
+    # Argelia
+    "7T": "Algeria", "7X": "Algeria",
+    # Angola
+    "D2": "Angola", "D3": "Angola",
+    # Libia
+    "5A": "Libya",
+    # Sudán
+    "ST": "Sudan",
+    # Namibia
+    "V5": "Namibia",
+    # Botsuana
+    "A2": "Botswana",
+    # Kenia
+    "5Y": "Kenya", "5Z": "Kenya",
+    # Tanzania
+    "5H": "Tanzania", "5I": "Tanzania",
+    # Nigeria
+    "5N": "Nigeria", "5O": "Nigeria",
+    # Ghana
+    "9G": "Ghana",
+    # Sierra Leona
+    "9L": "Sierra Leone",
+    # Congo
+    "9O": "Democratic Republic of the Congo", "9P": "Democratic Republic of the Congo",
+    # Zambia
+    "9J": "Zambia",
+    # Zimbabue
+    "Z2": "Zimbabwe",
+    # Mozambique
+    "C9": "Mozambique",
+    # Islas Canarias (si se quiere separar)
+    # (EA8 ya cubierto por EA -> Spain)
+    # Malvinas/Falkland
+    "VP8": "Falkland Islands",
+    # Groenlandia
+    "XP": "Greenland",
+    # Antártida
+    "RI1": "Antarctica",
+    # Armenia
+    "EK": "Armenia",
+    # Georgia
+    "4L": "Georgia",
+    # Azerbaiyán
+    "4J": "Azerbaijan",
+    # Mongolia
+    "JT": "Mongolia", "JV": "Mongolia",
+    # Nepal
+    "9N": "Nepal",
+    # Tailandia
+    "E2": "Thailand", "HS": "Thailand",
+    # Malasia
+    "9M": "Malaysia", "WM": "Malaysia",
+    # Singapur
+    "9V": "Singapore",
+    # Pakistán
+    "AP": "Pakistan", "AQ": "Pakistan", "AR": "Pakistan",
+    "AS": "Pakistan",
+    # Bangladés
+    "S2": "Bangladesh", "S3": "Bangladesh",
+    # Sri Lanka
+    "4P": "Sri Lanka", "4Q": "Sri Lanka", "4R": "Sri Lanka",
+    # Irán
+    "EP": "Iran", "EQ": "Iran",
+    # Irak
+    "YI": "Iraq",
+    # Kuwait
+    "9K": "Kuwait",
+    # Omán
+    "A4": "Oman",
+    # Yemen
+    "7O": "Yemen",
+    # Jordania
+    "JY": "Jordan",
+    # Líbano
+    "OD": "Lebanon",
+    # Siria
+    "YK": "Syria",
+    # Mauricio
+    "3B": "Mauritius",
+    # Seychelles
+    "S7": "Seychelles",
+    # Cabo Verde
+    "D4": "Cape Verde",
+    # Santo Tomé
+    "S9": "Sao Tome and Principe",
+    # Guadalupe
+    "FG": "Guadeloupe",
+    # Martinica
+    "FM": "Martinique",
+    # Reunión
+    "FR": "Reunion",
+    # Mayotte
+    "FH": "Mayotte",
+    # Guayana Francesa
+    "FY": "French Guiana",
+    # Nueva Caledonia
+    "FK": "New Caledonia",
+    # Polinesia Francesa
+    "FO": "French Polynesia",
+    # San Pedro y Miquelón
+    "FP": "St. Pierre and Miquelon",
+    # Aruba
+    "P4": "Aruba",
+    # Antillas Holandesas / Curazao
+    "PJ": "Curacao",
+    # Bermuda
+    "VP9": "Bermuda",
+    # Bahamas
+    "C6": "Bahamas",
+    # Barbados
+    "8P": "Barbados",
+    # Jamaica
+    "6Y": "Jamaica",
+    # Trinidad y Tobago
+    "9Y": "Trinidad and Tobago", "9Z": "Trinidad and Tobago",
+    # Haití
+    "HH": "Haiti",
+    # Islas Vírgenes Británicas
+    "VP2V": "British Virgin Islands",
+    # Islas Caimán
+    "ZF": "Cayman Islands",
+    # Islas Turcas y Caicos
+    "VP5": "Turks and Caicos Islands",
+    # San Martín
+    "FS": "Saint Martin",
+    # San Bartolomé
+    "FJ": "Saint Barthelemy",
+    # Santa Lucía
+    "J6": "Saint Lucia",
+    # San Vicente
+    "J8": "Saint Vincent and the Grenadines",
+    # Granada
+    "J3": "Grenada",
+    # Dominica
+    "J7": "Dominica",
+    # Antigua y Barbuda
+    "V2": "Antigua and Barbuda",
+    # San Cristóbal y Nieves
+    "V4": "St. Kitts and Nevis",
+    # Islas Cook
+    "ZK": "New Zealand",  # ZK used by both NZ and Cook Islands
+    # Niue
+    "ZK2": "Niue",
+    # Samoa
+    "5W": "Samoa",
+    # Tonga
+    "A3": "Tonga",
+    # Fiyi
+    "3D2": "Fiji",
+    # Vanuatu
+    "YJ": "Vanuatu",
+    # Papúa Nueva Guinea
+    "P2": "Papua New Guinea",
+    # Islas Salomón
+    "H4": "Solomon Islands",
+    # Kiribati
+    "T3": "Kiribati",
+    # Hawái (USA)
+    "KH6": "United States",
+    # Alaska (USA)
+    "KL": "United States",
+    # Svalbard
+    "JW": "Norway",
+    # Jan Mayen
+    "JX": "Norway",
+    # Isla de Pascua
+    "CE0": "Chile",
+    # San Andrés
+    "HK0": "Colombia",
+    # Galápagos
+    "HC8": "Ecuador",
+    # Fernando de Noronha
+    "PY0": "Brazil",
+    # Trinidad (Brasil)
+    "PY0": "Brazil",
+    # Archipiélago de San Pedro y San Pablo
+    "PY0": "Brazil",
+}
+
+
+def get_country_from_callsign(call):
+    """
+    Determina el país a partir del indicativo (call sign) usando
+    el mapa de prefijos ITU.
+
+    Prueba prefijos de mayor a menor longitud (hasta 4 caracteres)
+    para manejar correctamente todos los formatos ITU:
+    - Letras: EA, F, DL, K
+    - Dígito+Letra: 9A, 3V, 5B
+    - Letra+Dígito: C3, S5, E7, V3
+
+    Args:
+        call (str): Indicativo de la estación (ej: EA5XC, F1ROA, DL1NRC)
+
+    Returns:
+        str: Nombre del país en inglés, o "Desconocido" si no se puede determinar
+    """
+    if not call:
+        return "Desconocido"
+
+    call = call.upper().strip()
+
+    # Quitar sufijos /P (portable), /M (mobile), /MM (maritime mobile), etc.
+    if "/" in call:
+        # Tomar la parte antes de la primera /
+        call = call.split("/")[0]
+
+    # Probar prefijos de longitud 4, 3, 2, 1
+    max_len = min(4, len(call))
+    for length in range(max_len, 0, -1):
+        prefix = call[:length]
+        if prefix in PREFIX_COUNTRY_MAP:
+            return PREFIX_COUNTRY_MAP[prefix]
+
+    return "Desconocido"
+
+
+def assign_countries(qsos):
+    """
+    Asigna el país a cada QSO basándose en el indicativo (CALL)
+    cuando el campo COUNTRY está ausente o es "Desconocido".
+
+    Args:
+        qsos (list): Lista de diccionarios de QSOs (modificada in-place)
+    """
+    for qso in qsos:
+        country = qso.get("COUNTRY", "")
+        if not country or country == "Desconocido" or country == "Unknown":
+            call = qso.get("CALL", "")
+            if call:
+                qso["COUNTRY"] = get_country_from_callsign(call)
+
+
+# ==============================================================================
 # SECCIÓN 1: PARSEO DEL ARCHIVO ADIF
 # ==============================================================================
 
@@ -2338,6 +2838,10 @@ def main():
     if not qsos:
         print("No se encontraron QSOs en el archivo.")
         return
+
+    # Asignar países a los QSOs que no tengan campo COUNTRY
+    print("Asignando países basados en prefijos de indicativos...")
+    assign_countries(qsos)
 
     # Generar todo el reporte
     stats = generate_statistics_report(qsos)

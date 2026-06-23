@@ -36,6 +36,189 @@ plt.rcParams["figure.figsize"] = (12, 8)
 plt.rcParams["font.size"] = 10
 plt.rcParams["axes.grid"] = True
 
+# ==============================================================================
+# MAPA DE PREFIJOS DE INDICATIVOS A PAÍSES (ITU Prefix Allocation)
+# ==============================================================================
+
+PREFIX_COUNTRY_MAP = {
+    "EA": "Spain", "EB": "Spain", "EC": "Spain", "ED": "Spain",
+    "EE": "Spain", "EF": "Spain", "EG": "Spain", "EH": "Spain",
+    "CT": "Portugal", "CS": "Portugal",
+    "F": "France",
+    "DA": "Germany", "DB": "Germany", "DC": "Germany", "DD": "Germany",
+    "DE": "Germany", "DF": "Germany", "DG": "Germany", "DH": "Germany",
+    "DI": "Germany", "DJ": "Germany", "DK": "Germany", "DL": "Germany",
+    "DM": "Germany", "DN": "Germany", "DO": "Germany",
+    "G": "England", "M": "England", "2E": "England",
+    "MM": "Scotland", "GM": "Scotland",
+    "GI": "Northern Ireland", "MI": "Northern Ireland",
+    "GW": "Wales", "MW": "Wales", "GD": "Isle of Man", "MD": "Isle of Man",
+    "GU": "Guernsey", "GJ": "Jersey",
+    "I": "Italy", "IK": "Italy", "IZ": "Italy", "IU": "Italy",
+    "IW": "Italy", "IN": "Italy", "IQ": "Italy", "IR": "Italy",
+    "IS": "Italy", "IT": "Italy",
+    "ON": "Belgium", "OR": "Belgium",
+    "PA": "Netherlands", "PB": "Netherlands", "PC": "Netherlands",
+    "PD": "Netherlands", "PE": "Netherlands", "PI": "Netherlands",
+    "OE": "Austria",
+    "OK": "Czech Republic", "OL": "Czech Republic",
+    "OM": "Slovakia",
+    "SP": "Poland", "SQ": "Poland", "SR": "Poland",
+    "LZ": "Bulgaria",
+    "9A": "Croatia",
+    "HA": "Hungary", "HG": "Hungary",
+    "S5": "Slovenia",
+    "OZ": "Denmark",
+    "TF": "Iceland",
+    "UR": "Ukraine", "UT": "Ukraine", "UU": "Ukraine",
+    "UY": "Ukraine", "UZ": "Ukraine", "EM": "Ukraine", "EO": "Ukraine",
+    "SV": "Greece", "SY": "Greece",
+    "EI": "Ireland", "EJ": "Ireland",
+    "C3": "Andorra",
+    "9H": "Malta",
+    "TA": "Turkey", "TB": "Turkey", "TC": "Turkey",
+    "V3": "Belize",
+    "HB": "Switzerland", "HE": "Switzerland",
+    "LX": "Luxembourg",
+    "LA": "Norway", "LB": "Norway",
+    "SM": "Sweden", "SK": "Sweden", "SA": "Sweden",
+    "OH": "Finland", "OI": "Finland",
+    "YO": "Romania", "YR": "Romania",
+    "YU": "Serbia", "YT": "Serbia",
+    "E7": "Bosnia and Herzegovina",
+    "EW": "Belarus",
+    "ER": "Moldova",
+    "LY": "Lithuania",
+    "YL": "Latvia",
+    "ES": "Estonia",
+    "JA": "Japan", "JH": "Japan",
+    "PY": "Brazil", "PT": "Brazil", "PU": "Brazil",
+    "K": "United States", "N": "United States", "W": "United States",
+    "AA": "United States", "AB": "United States", "AC": "United States",
+    "AD": "United States", "AE": "United States", "AF": "United States",
+    "AG": "United States", "AH": "United States", "AI": "United States",
+    "AJ": "United States", "AK": "United States", "AL": "United States",
+    "KA": "United States", "KB": "United States", "KC": "United States",
+    "KD": "United States", "KE": "United States", "KF": "United States",
+    "KG": "United States", "KH": "United States", "KI": "United States",
+    "KJ": "United States", "KK": "United States", "KL": "United States",
+    "KM": "United States", "KN": "United States", "KO": "United States",
+    "KP": "United States", "KQ": "United States", "KR": "United States",
+    "KS": "United States", "KT": "United States", "KU": "United States",
+    "KV": "United States", "KW": "United States", "KX": "United States",
+    "KY": "United States", "KZ": "United States",
+    "NA": "United States", "NB": "United States", "NC": "United States",
+    "ND": "United States", "NE": "United States", "NF": "United States",
+    "NG": "United States", "NH": "United States", "NI": "United States",
+    "NJ": "United States", "NK": "United States", "NL": "United States",
+    "NM": "United States", "NN": "United States", "NO": "United States",
+    "NP": "United States", "NQ": "United States",
+    "WA": "United States", "WB": "United States", "WC": "United States",
+    "WD": "United States", "WE": "United States", "WF": "United States",
+    "WG": "United States", "WH": "United States", "WI": "United States",
+    "WJ": "United States", "WK": "United States", "WL": "United States",
+    "WM": "United States", "WN": "United States", "WO": "United States",
+    "WP": "United States", "WQ": "United States", "WR": "United States",
+    "WS": "United States", "WT": "United States", "WU": "United States",
+    "WV": "United States", "WW": "United States", "WX": "United States",
+    "WY": "United States", "WZ": "United States",
+    "KP3": "United States", "KP4": "United States", "NP3": "United States", "NP4": "United States",
+    "VA": "Canada", "VE": "Canada", "VO": "Canada", "VY": "Canada",
+    "R": "Russia", "RA": "Russia", "RB": "Russia", "RC": "Russia",
+    "RD": "Russia", "RE": "Russia", "RF": "Russia", "RG": "Russia",
+    "RH": "Russia", "RI": "Russia", "RJ": "Russia", "RK": "Russia",
+    "RL": "Russia", "RM": "Russia", "RN": "Russia", "RO": "Russia",
+    "RP": "Russia", "RQ": "Russia", "RR": "Russia", "RS": "Russia",
+    "RT": "Russia", "RU": "Russia", "RV": "Russia", "RW": "Russia",
+    "RX": "Russia", "RY": "Russia", "RZ": "Russia",
+    "UA": "Russia", "UB": "Russia", "UC": "Russia", "UD": "Russia",
+    "UE": "Russia", "UF": "Russia", "UG": "Russia", "UH": "Russia",
+    "UI": "Russia",
+    "3V": "Tunisia",
+    "5B": "Cyprus",
+    "CN": "Morocco",
+    "SU": "Egypt",
+    "ZS": "South Africa",
+    "VK": "Australia",
+    "ZL": "New Zealand",
+    "YB": "Indonesia",
+    "DU": "Philippines",
+    "4X": "Israel", "4Z": "Israel",
+    "A6": "United Arab Emirates",
+    "A7": "Qatar",
+    "A9": "Bahrain",
+    "HZ": "Saudi Arabia",
+    "EX": "Kyrgyzstan",
+    "EK": "Armenia",
+    "UK": "Uzbekistan",
+    "UN": "Kazakhstan",
+    "EY": "Tajikistan",
+    "EZ": "Turkmenistan",
+    "5R": "Madagascar",
+    "9X": "Rwanda",
+    "HI": "Dominican Republic",
+    "HP": "Panama",
+    "CM": "Cuba", "CO": "Cuba",
+    "LU": "Argentina",
+    "CX": "Uruguay",
+    "CE": "Chile",
+    "OA": "Peru",
+    "HC": "Ecuador",
+    "YV": "Venezuela",
+    "HK": "Colombia", "HJ": "Colombia",
+    "XE": "Mexico",
+    "ZB": "Gibraltar",
+    "VU": "India",
+    "BA": "China", "BG": "China", "BH": "China",
+    "VR": "Hong Kong",
+    "BV": "Taiwan",
+    "HL": "South Korea",
+    "7X": "Algeria",
+    "ST": "Sudan",
+    "5A": "Libya",
+    "5N": "Nigeria",
+    "9G": "Ghana",
+    "9K": "Kuwait",
+    "AP": "Pakistan",
+    "HS": "Thailand",
+    "9M": "Malaysia",
+    "9V": "Singapore",
+    "9N": "Nepal",
+    "EP": "Iran",
+    "YI": "Iraq",
+    "JY": "Jordan",
+    "OD": "Lebanon",
+    "YK": "Syria",
+    "4L": "Georgia",
+    "4J": "Azerbaijan",
+    "JT": "Mongolia",
+    "S2": "Bangladesh",
+}
+
+
+def get_country_from_callsign(call):
+    if not call:
+        return "Desconocido"
+    call = call.upper().strip()
+    if "/" in call:
+        call = call.split("/")[0]
+    max_len = min(4, len(call))
+    for length in range(max_len, 0, -1):
+        prefix = call[:length]
+        if prefix in PREFIX_COUNTRY_MAP:
+            return PREFIX_COUNTRY_MAP[prefix]
+    return "Desconocido"
+
+
+def assign_countries(qsos):
+    for qso in qsos:
+        country = qso.get("COUNTRY", "")
+        if not country or country == "Desconocido" or country == "Unknown":
+            call = qso.get("CALL", "")
+            if call:
+                qso["COUNTRY"] = get_country_from_callsign(call)
+
+
 # Paleta de colores para operadores
 OPERATOR_COLORS = [
     "#e41a1c",
@@ -725,6 +908,10 @@ def main():
 
     qsos = parse_adi_file(filename)
     print(f"Total QSOs encontrados: {len(qsos)}")
+
+    # Asignar países basados en prefijos de indicativos
+    print("Asignando países basados en prefijos de indicativos...")
+    assign_countries(qsos)
 
     # Agrupar por operador
     operators_qsos = group_by_operator(qsos)

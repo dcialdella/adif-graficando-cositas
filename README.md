@@ -12,8 +12,22 @@ Este proyecto contiene dos scripts que generan **más de 30 gráficos estadísti
 
 | Script | Descripción | Gráficos |
 |--------|-------------|-----------|
-| `analizar_adi_grafico.py` | Análisis general del log completo | 18 gráficos |
+| `analizar_adi_grafico.py` | Análisis general del log completo | 22 gráficos |
 | `analizar_por_operador.py` | Análisis detallado por operador | 14 gráficos |
+
+### 🌍 Asignación Automática de Países
+
+Muchos archivos ADIF no incluyen el campo `COUNTRY` en los QSOs. Los scripts resuelven automáticamente el país de cada estación a partir del **prefijo ITU del indicativo** (call sign):
+
+- `EA`/`EB`/`EC`... → Spain
+- `F` → France
+- `DL`/`DK`/`DO`... → Germany
+- `G`/`M`/`2E`... → England
+- `I`/`IK`/`IZ`... → Italy
+- `CT`/`CS`... → Portugal
+- Y más de **400 prefijos** de todos los países
+
+Esto garantiza que **todos los QSOs tengan país asignado** incluso cuando el archivo ADIF no incluye el campo `COUNTRY`.
 
 ## 🚀 Uso Rápido
 
@@ -46,7 +60,7 @@ python analizar_por_operador.py
 ## 📁 Estructura del Proyecto
 
 ```
-├── aaa.adi                          # Archivo ADIF de ejemplo (2,351 QSOs)
+├── aaa.adi                          # Archivo ADIF de ejemplo (524 QSOs)
 ├── analizar_adi_grafico.py           # Script 1: Análisis general
 ├── analizar_por_operador.py          # Script 2: Análisis por operador
 ├── requirements.txt                  # Dependencias Python
@@ -54,9 +68,9 @@ python analizar_por_operador.py
 ├── run_analysis.sh                  # Script: Ejecutar análisis general
 ├── estadisticas_adi.json            # Estadísticas en JSON
 │
-├── GRÁFICOS ANÁLISIS GENERAL (17):
-│   ├── grafico_paises.png           # Top 15 países
-│   ├── grafico_localizadores.png     # Top 20 localizadores Maidenhead
+├── GRÁFICOS ANÁLISIS GENERAL (22):
+│   ├── grafico_paises.png           # Top 15 países (barras + pastel)
+│   ├── grafico_localizadores.png    # Top 20 localizadores Maidenhead
 │   ├── grafico_modos_bandas.png     # Modos y bandas (4 subplots)
 │   ├── grafico_estaciones_top.png   # Top 20 estaciones
 │   ├── grafico_distribucion_horaria.png  # Actividad por hora
@@ -70,24 +84,29 @@ python analizar_por_operador.py
 │   ├── grafico_banda_modo.png       # Heatmap banda vs modo
 │   ├── grafico_dxcc.png             # Top 20 DXCC
 │   ├── grafico_dashboard.png        # Dashboard resumen (6 subplots)
+│   ├── grafico_distancia_locator.png # Distancia por banda/modo
 │   ├── grafico_qrz_lookups.png      # Lookups en QRZ.com
-│   └── grafico_fonia_por_hora.png   # Fonía por hora UTC
+│   ├── grafico_fonia_por_hora.png   # Fonía por hora UTC
+│   ├── grafico_banda_hora.png       # Heatmap banda vs hora
+│   ├── grafico_estaciones_unicas.png # Únicas vs repetidas
+│   ├── grafico_mapa_operadores.png  # Mapa por operador
+│   └── grafico_sankey.html          # Diagrama Sankey interactivo
 │
 └── GRÁFICOS ANÁLISIS POR OPERADOR (14):
-    ├── operador_resumen.png          # Comparativa total QSOs
-    ├── operador_bandas.png          # Bandas por operador (heatmap)
-    ├── operador_modos.png           # Modos por operador (heatmap)
-    ├── operador_horas.png           # Actividad horaria por operador
-    ├── operador_comparacion_bandas.png  # Barras agrupadas bandas
-    ├── operador_comparacion_modos.png   # Barras agrupadas modos
-    ├── operador_EA1JBW.png          # Detalle individual EA1JBW
-    ├── operador_EA3JAQ.png          # Detalle individual EA3JAQ
-    ├── operador_EA4GHH.png          # Detalle individual EA4GHH
-    ├── operador_EA4HUK.png          # Detalle individual EA4HUK
-    ├── operador_EA7GSP.png          # Detalle individual EA7GSP
-    ├── operador_EA7LDI.png          # Detalle individual EA7LDI
-    ├── operador_EA7LHS.png          # Detalle individual EA7LHS
-    └── operador_EB4GSN.png          # Detalle individual EB4GSN
+    ├── operador_resumen.png             # Comparativa total QSOs
+    ├── operador_bandas.png             # Bandas por operador (heatmap)
+    ├── operador_modos.png              # Modos por operador (heatmap)
+    ├── operador_horas.png              # Actividad horaria por operador
+    ├── operador_comparacion_bandas.png # Barras agrupadas bandas
+    ├── operador_comparacion_modos.png  # Barras agrupadas modos
+    ├── operador_EB4GSN.png             # Detalle individual EB4GSN
+    ├── operador_EA4INH.png             # Detalle individual EA4INH
+    ├── operador_EA4IFI.png             # Detalle individual EA4IFI
+    ├── operador_EA7LHS.png             # Detalle individual EA7LHS
+    ├── operador_EA3JAQ.png             # Detalle individual EA3JAQ
+    ├── operador_EB1CU.png              # Detalle individual EB1CU
+    ├── operador_EA4HUK.png             # Detalle individual EA4HUK
+    └── operador_EA3JCP.png             # Detalle individual EA3JCP
 ```
 
 ---
@@ -142,8 +161,8 @@ Histograma lineal y logarítmico de distancias en km.
 
 | Métrica | Valor |
 |---------|-------|
-| Distancia media | 2,129 km |
-| Distancia máxima | 19,765 km |
+| Distancia media | 1,524 km |
+| Distancia máxima | 10,524 km |
 
 #### 9. Distancias por Localizador (Banda, Modo y Potencia)
 ![Distancias por Localizador](grafico_distancia_locator.png)
@@ -215,9 +234,9 @@ Análisis específico de contactos en fonía (SSB/FM) por hora UTC.
 
 | Métrica | Valor |
 |---------|-------|
-| Total QSOs fonía | 1,250 |
-| Hora pico | 18:00 UTC |
-| QSOs en hora pico | 231 |
+| Total QSOs fonía | 277 |
+| Hora pico | 10:00 UTC |
+| QSOs en hora pico | 44 |
 
 ---
 
@@ -229,14 +248,14 @@ Agrupa los contactos por el campo `OPERATOR` y genera estadísticas individuales
 
 | Operador | Total QSOs | Banda Favorita | Modo Favorito | Hora Pico |
 |----------|-----------|----------------|---------------|-----------|
-| **EA4HUK** | 742 | 40M (524) | SSB (570) | 11:00 UTC |
-| **EB4GSN** | 622 | 20M (347) | FT8 (543) | 07:00 UTC |
-| **EA7LDI** | 259 | 40M (219) | FT8 (144) | 18:00 UTC |
-| **EA7LHS** | 254 | 40M (107) | SSB (140) | 16:00 UTC |
-| **EA4GHH** | 240 | 40M (194) | SSB (125) | 10:00 UTC |
-| **EA3JAQ** | 113 | 20M (57) | SSB (59) | 20:00 UTC |
-| **EA1JBW** | 103 | 20M (84) | SSB (103) | 18:00 UTC |
-| **EA7GSP** | 18 | 70CM (18) | DIGITALVOICE (18) | 21:00 UTC |
+| **EB4GSN** | 229 | 20M (187) | FT8 (131) | 08:00 UTC |
+| **EA4IFI** | 90 | 40M (90) | SSB (90) | 10:00 UTC |
+| **EB1CU** | 54 | 15M (23) | FT8 (54) | 21:00 UTC |
+| **EA3JAQ** | 45 | 40M (35) | SSB (45) | 07:00 UTC |
+| **EA4HUK** | 36 | 20M (36) | SSB (36) | 11:00 UTC |
+| **EA7LHS** | 27 | 20M (11) | FT8 (17) | 22:00 UTC |
+| **EA3JCP** | 23 | 2M (23) | FM (23) | 09:00 UTC |
+| **EA4INH** | 20 | 40M (20) | SSB (20) | 11:00 UTC |
 
 ### Gráficos Comparativos
 
@@ -274,48 +293,57 @@ Barras agrupadas comparando modos entre operadores.
 
 Cada operador tiene su propio gráfico con: Bandas, Modos (pastel), Actividad horaria, Días de la semana.
 
-| EA1JBW | EA3JAQ | EA4GHH |
+| EB4GSN | EA4IFI | EB1CU |
 |--------|--------|--------|
-| ![EA1JBW](operador_EA1JBW.png) | ![EA3JAQ](operador_EA3JAQ.png) | ![EA4GHH](operador_EA4GHH.png) |
+| ![EB4GSN](operador_EB4GSN.png) | ![EA4IFI](operador_EA4IFI.png) | ![EB1CU](operador_EB1CU.png) |
 
-| EA4HUK | EA7GSP | EA7LDI |
+| EA3JAQ | EA4HUK | EA7LHS |
 |--------|--------|--------|
-| ![EA4HUK](operador_EA4HUK.png) | ![EA7GSP](operador_EA7GSP.png) | ![EA7LDI](operador_EA7LDI.png) |
+| ![EA3JAQ](operador_EA3JAQ.png) | ![EA4HUK](operador_EA4HUK.png) | ![EA7LHS](operador_EA7LHS.png) |
 
-| EA7LHS | EB4GSN |
+| EA3JCP | EA4INH |
 |--------|--------|
-| ![EA7LHS](operador_EA7LHS.png) | ![EB4GSN](operador_EB4GSN.png) |
+| ![EA3JCP](operador_EA3JCP.png) | ![EA4INH](operador_EA4INH.png) |
 
 ---
 
 ## 📊 Estadísticas del Log de Ejemplo
 
 ```
-Total QSOs analizados:     2,351
-Operadores únicos:         8
-Países contactados:       45
-Localizadores únicos:     367
-Estaciones únicas:       1,775
-Zonas CQ únicas:          8
-Zonas ITU únicas:         8
-Distancia media:      2,129 km
-Distancia máxima:     19,765 km
+Total QSOs analizados:       524
+Operadores únicos:             8
+Países contactados:           45
+Localizadores únicos:        135
+Estaciones únicas:           435
+Zonas CQ únicas:              4
+Zonas ITU únicas:             5
+Distancia media:        1,524 km
+Distancia máxima:      10,524 km
 
 Modos utilizados:
-  - SSB (Fonía): 1,250 QSOs
-  - FT8 (Digital)
-  - FM
-  - DIGITALVOICE
-  - MFSK
+  - SSB (Fonía): 250 QSOs
+  - FT8 (Digital): 202 QSOs
+  - MFSK (FT4): 45 QSOs
+  - FM: 27 QSOs
 
 Bandas utilizadas:
   - 40M, 20M, 15M, 10M (HF)
-  - 2M, 70cm (VHF/UHF)
+  - 2M (VHF)
 ```
 
 ---
 
-## 🔧 Personalización
+## 🌍 Corrección de Países Faltantes
+
+Si tu archivo ADIF no incluye el campo `COUNTRY`, los scripts lo asignan automáticamente analizando el prefijo ITU del indicativo (campo `CALL`). La función `get_country_from_callsign()` en ambos scripts reconoce **más de 400 prefijos** de todo el mundo.
+
+Si algún QSO queda sin país ("Desconocido"), puedes extender el diccionario `PREFIX_COUNTRY_MAP` añadiendo el prefijo que falte:
+
+```python
+PREFIX_COUNTRY_MAP["XX"] = "Mi País"
+```
+
+---
 
 ### Cambiar archivo de entrada
 
