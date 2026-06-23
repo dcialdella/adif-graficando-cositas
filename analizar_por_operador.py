@@ -837,6 +837,99 @@ def create_comparison_modes_chart(operators_data, output_prefix="operador"):
     print(f"  ✓ {output_prefix}_comparacion_modos.png")
 
 
+def create_countries_by_operator_chart(operators_data, output_prefix="operador"):
+    """
+    Genera gráfico comparativo de países por operador (barras agrupadas).
+
+    Muestra los países más populares y qué operador contactó cada uno.
+
+    Args:
+        operators_data (dict): {operador: {stats}}
+        output_prefix (str): Prefijo para el nombre del archivo
+    """
+    if not operators_data:
+        return
+
+    operators = list(operators_data.keys())
+
+    country_totals = Counter()
+    for data in operators_data.values():
+        country_totals.update(data["paises"])
+
+    main_countries = [c for c, _ in country_totals.most_common(12)]
+
+    if not main_countries:
+        return
+
+    fig, ax = plt.subplots(figsize=(16, 8))
+
+    x = np.arange(len(operators))
+    width = 0.8 / len(main_countries)
+    country_colors = plt.cm.Set3(np.linspace(0, 1, len(main_countries)))
+
+    for j, country in enumerate(main_countries):
+        offset = (j - len(main_countries) / 2 + 0.5) * width
+        values = [operators_data[op]["paises"].get(country, 0) for op in operators]
+        ax.bar(x + offset, values, width, label=country, color=country_colors[j], alpha=0.8)
+
+    ax.set_xlabel("Operador", fontsize=12)
+    ax.set_ylabel("Número de QSOs", fontsize=12)
+    ax.set_title("Comparación de Países por Operador (Top 12)", fontsize=14, fontweight="bold")
+    ax.set_xticks(x)
+    ax.set_xticklabels(operators, rotation=45)
+    ax.legend(title="País", bbox_to_anchor=(1.02, 1), loc="upper left")
+    ax.grid(True, alpha=0.3, axis="y")
+
+    plt.tight_layout()
+    plt.savefig(f"{output_prefix}_comparacion_paises.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+    print(f"  ✓ {output_prefix}_comparacion_paises.png")
+
+
+def create_individual_countries_charts(operators_data):
+    """
+    Genera un gráfico de países para cada operador (todos los países ordenados).
+
+    Args:
+        operators_data (dict): {operador: {stats}}
+    """
+    for operator, data in operators_data.items():
+        if not data["paises"]:
+            continue
+
+        sorted_countries = sorted(data["paises"].items(), key=lambda x: x[1], reverse=True)
+        countries = [c[0] for c in sorted_countries]
+        counts = [c[1] for c in sorted_countries]
+
+        fig, ax = plt.subplots(figsize=(max(10, len(countries) * 0.5), max(5, len(countries) * 0.35)))
+
+        y_pos = range(len(countries))
+        bars = ax.barh(y_pos, counts, color="skyblue", edgecolor="navy", alpha=0.7)
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(countries)
+        ax.invert_yaxis()
+        ax.set_xlabel("Número de QSOs", fontsize=12)
+        ax.set_title(f"Países Contactados - {operator} ({data['total']} QSOs)", fontsize=14, fontweight="bold")
+
+        for bar, count in zip(bars, counts):
+            ax.text(
+                bar.get_width() + 0.3,
+                bar.get_y() + bar.get_height() / 2.0,
+                str(count),
+                ha="left",
+                va="center",
+                fontsize=9,
+            )
+
+        plt.tight_layout()
+        safe_name = operator.replace("/", "_").replace(" ", "_")
+        plt.savefig(f"operador_{safe_name}_paises.png", dpi=300, bbox_inches="tight")
+        plt.close()
+
+        print(f"  ✓ operador_{safe_name}_paises.png")
+
+
 # ==============================================================================
 # REPORTE
 # ==============================================================================
@@ -940,10 +1033,15 @@ def main():
     # Gráficos de comparación
     create_comparison_bands_chart(operators_data)
     create_comparison_modes_chart(operators_data)
+    create_countries_by_operator_chart(operators_data)
 
     # Gráficos individuales
     print("\n  Gráficos individuales por operador:")
     create_operator_individual_charts(operators_data)
+
+    # Gráficos de países por operador
+    print("\n  Gráficos de países por operador:")
+    create_individual_countries_charts(operators_data)
 
     # Resumen final
     print("\n" + "=" * 70)
@@ -957,10 +1055,15 @@ def main():
     print("    - operador_horas.png")
     print("    - operador_comparacion_bandas.png")
     print("    - operador_comparacion_modos.png")
+    print("    - operador_comparacion_paises.png")
     print("  INDIVIDUALES:")
     for op in operators_qsos.keys():
         safe_name = op.replace("/", "_").replace(" ", "_")
         print(f"    - operador_{safe_name}.png")
+    print("  PAÍSES POR OPERADOR:")
+    for op in operators_qsos.keys():
+        safe_name = op.replace("/", "_").replace(" ", "_")
+        print(f"    - operador_{safe_name}_paises.png")
     print("=" * 70)
 
 

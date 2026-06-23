@@ -8,12 +8,12 @@ Scripts en Python para analizar archivos de log de radioaficionados en formato A
 
 ## 📋 Descripción
 
-Este proyecto contiene dos scripts que generan **más de 30 gráficos estadísticos** a partir de archivos ADIF:
+Este proyecto contiene dos scripts que generan **más de 40 gráficos estadísticos** a partir de archivos ADIF:
 
 | Script | Descripción | Gráficos |
 |--------|-------------|-----------|
-| `analizar_adi_grafico.py` | Análisis general del log completo | 22 gráficos |
-| `analizar_por_operador.py` | Análisis detallado por operador | 14 gráficos |
+| `analizar_adi_grafico.py` | Análisis general del log completo | 23 gráficos |
+| `analizar_por_operador.py` | Análisis detallado por operador | 23 gráficos |
 
 ### 🌍 Asignación Automática de Países
 
@@ -68,8 +68,9 @@ python analizar_por_operador.py
 ├── run_analysis.sh                  # Script: Ejecutar análisis general
 ├── estadisticas_adi.json            # Estadísticas en JSON
 │
-├── GRÁFICOS ANÁLISIS GENERAL (22):
+├── GRÁFICOS ANÁLISIS GENERAL (23):
 │   ├── grafico_paises.png           # Top 15 países (barras + pastel)
+│   ├── grafico_paises_todos.png     # Todos los países ordenados por QSO
 │   ├── grafico_localizadores.png    # Top 20 localizadores Maidenhead
 │   ├── grafico_modos_bandas.png     # Modos y bandas (4 subplots)
 │   ├── grafico_estaciones_top.png   # Top 20 estaciones
@@ -92,26 +93,35 @@ python analizar_por_operador.py
 │   ├── grafico_mapa_operadores.png  # Mapa por operador
 │   └── grafico_sankey.html          # Diagrama Sankey interactivo
 │
-└── GRÁFICOS ANÁLISIS POR OPERADOR (14):
-    ├── operador_resumen.png             # Comparativa total QSOs
-    ├── operador_bandas.png             # Bandas por operador (heatmap)
-    ├── operador_modos.png              # Modos por operador (heatmap)
-    ├── operador_horas.png              # Actividad horaria por operador
-    ├── operador_comparacion_bandas.png # Barras agrupadas bandas
-    ├── operador_comparacion_modos.png  # Barras agrupadas modos
-    ├── operador_EB4GSN.png             # Detalle individual EB4GSN
-    ├── operador_EA4INH.png             # Detalle individual EA4INH
-    ├── operador_EA4IFI.png             # Detalle individual EA4IFI
-    ├── operador_EA7LHS.png             # Detalle individual EA7LHS
-    ├── operador_EA3JAQ.png             # Detalle individual EA3JAQ
-    ├── operador_EB1CU.png              # Detalle individual EB1CU
-    ├── operador_EA4HUK.png             # Detalle individual EA4HUK
-    └── operador_EA3JCP.png             # Detalle individual EA3JCP
+└── GRÁFICOS ANÁLISIS POR OPERADOR (23):
+    ├── operador_resumen.png                # Comparativa total QSOs
+    ├── operador_bandas.png                 # Bandas por operador (heatmap)
+    ├── operador_modos.png                  # Modos por operador (heatmap)
+    ├── operador_horas.png                  # Actividad horaria por operador
+    ├── operador_comparacion_bandas.png     # Barras agrupadas bandas
+    ├── operador_comparacion_modos.png      # Barras agrupadas modos
+    ├── operador_comparacion_paises.png     # Barras agrupadas países
+    ├── operador_EB4GSN.png                 # Detalle individual EB4GSN
+    ├── operador_EA4INH.png                 # Detalle individual EA4INH
+    ├── operador_EA4IFI.png                 # Detalle individual EA4IFI
+    ├── operador_EA7LHS.png                 # Detalle individual EA7LHS
+    ├── operador_EA3JAQ.png                 # Detalle individual EA3JAQ
+    ├── operador_EB1CU.png                  # Detalle individual EB1CU
+    ├── operador_EA4HUK.png                 # Detalle individual EA4HUK
+    ├── operador_EA3JCP.png                 # Detalle individual EA3JCP
+    ├── operador_EB4GSN_paises.png          # Países de EB4GSN
+    ├── operador_EA4INH_paises.png          # Países de EA4INH
+    ├── operador_EA4IFI_paises.png          # Países de EA4IFI
+    ├── operador_EA7LHS_paises.png          # Países de EA7LHS
+    ├── operador_EA3JAQ_paises.png          # Países de EA3JAQ
+    ├── operador_EB1CU_paises.png           # Países de EB1CU
+    ├── operador_EA4HUK_paises.png          # Países de EA4HUK
+    └── operador_EA3JCP_paises.png          # Países de EA3JCP
 ```
 
 ---
 
-## 📈 Script 1: Análisis General (17 gráficos)
+## 📈 Script 1: Análisis General (18 gráficos)
 
 ### Gráficos Básicos
 
@@ -119,6 +129,11 @@ python analizar_por_operador.py
 ![Gráfico de Países](grafico_paises.png)
 
 Top 15 países contactados con barras y distribución porcentual.
+
+#### 1b. Todos los Países Ordenados
+![Todos los Países](grafico_paises_todos.png)
+
+Ranking completo de todos los países contactados, ordenados de mayor a menor cantidad de QSOs.
 
 #### 2. Localizadores Maidenhead
 ![Gráfico de Localizadores](grafico_localizadores.png)
@@ -240,7 +255,7 @@ Análisis específico de contactos en fonía (SSB/FM) por hora UTC.
 
 ---
 
-## 👥 Script 2: Análisis por Operador (14 gráficos)
+## 👥 Script 2: Análisis por Operador (23 gráficos)
 
 Agrupa los contactos por el campo `OPERATOR` y genera estadísticas individuales y comparativas.
 
@@ -289,6 +304,11 @@ Barras agrupadas comparando bandas entre operadores.
 
 Barras agrupadas comparando modos entre operadores.
 
+#### Comparación de Países
+![Comparación Países](operador_comparacion_paises.png)
+
+Barras agrupadas comparando los países más contactados por cada operador (top 12).
+
 ### Gráficos Individuales (4 subplots cada uno)
 
 Cada operador tiene su propio gráfico con: Bandas, Modos (pastel), Actividad horaria, Días de la semana.
@@ -304,6 +324,22 @@ Cada operador tiene su propio gráfico con: Bandas, Modos (pastel), Actividad ho
 | EA3JCP | EA4INH |
 |--------|--------|
 | ![EA3JCP](operador_EA3JCP.png) | ![EA4INH](operador_EA4INH.png) |
+
+### Gráficos de Países por Operador
+
+Cada operador tiene su propio gráfico de **todos los países** que contactó, ordenados por cantidad de QSOs.
+
+| EB4GSN (31 países) | EA4IFI (3 países) | EB1CU (18 países) |
+|--------|--------|--------|
+| ![EB4GSN Países](operador_EB4GSN_paises.png) | ![EA4IFI Países](operador_EA4IFI_paises.png) | ![EB1CU Países](operador_EB1CU_paises.png) |
+
+| EA3JAQ (7 países) | EA4HUK (14 países) | EA7LHS (15 países) |
+|--------|--------|--------|
+| ![EA3JAQ Países](operador_EA3JAQ_paises.png) | ![EA4HUK Países](operador_EA4HUK_paises.png) | ![EA7LHS Países](operador_EA7LHS_paises.png) |
+
+| EA3JCP (1 país) | EA4INH (2 países) |
+|--------|--------|
+| ![EA3JCP Países](operador_EA3JCP_paises.png) | ![EA4INH Países](operador_EA4INH_paises.png) |
 
 ---
 

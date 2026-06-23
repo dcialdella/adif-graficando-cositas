@@ -1155,6 +1155,45 @@ def create_countries_chart(countries_data, total_qsos):
     plt.close()
 
 
+def create_all_countries_chart(countries_data):
+    """
+    Genera gráfico con TODOS los países ordenados por cantidad de contactos.
+
+    Muestra todos los países en barras horizontales, ordenados de mayor a menor,
+    para ver la distribución completa.
+
+    Args:
+        countries_data (dict): {país: cantidad}
+    """
+    sorted_countries = sorted(countries_data.items(), key=lambda x: x[1], reverse=True)
+    countries = [c[0] for c in sorted_countries]
+    counts = [c[1] for c in sorted_countries]
+
+    fig, ax = plt.subplots(figsize=(max(12, len(countries) * 0.5), max(6, len(countries) * 0.4)))
+
+    y_pos = range(len(countries))
+    bars = ax.barh(y_pos, counts, color="skyblue", edgecolor="navy", alpha=0.7)
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(countries)
+    ax.invert_yaxis()
+    ax.set_xlabel("Número de QSOs", fontsize=12)
+    ax.set_title("Todos los Países - Contactos por País", fontsize=14, fontweight="bold")
+
+    for bar, count in zip(bars, counts):
+        ax.text(
+            bar.get_width() + 0.3,
+            bar.get_y() + bar.get_height() / 2.0,
+            str(count),
+            ha="left",
+            va="center",
+            fontsize=9,
+        )
+
+    plt.tight_layout()
+    plt.savefig("grafico_paises_todos.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+
 def create_locators_chart(locators_data):
     """
     Genera gráfico de localizadores Maidenhead más contactados.
@@ -2679,6 +2718,9 @@ def generate_statistics_report(qsos):
     create_countries_chart(countries, len(qsos))
     print("  ✓ grafico_paises.png")
 
+    create_all_countries_chart(countries)
+    print("  ✓ grafico_paises_todos.png")
+
     create_locators_chart(locators)
     print("  ✓ grafico_localizadores.png")
 
@@ -2861,6 +2903,7 @@ def main():
     print("    - estadisticas_adi.json")
     print("\n  GRÁFICOS BÁSICOS:")
     print("    - grafico_paises.png")
+    print("    - grafico_paises_todos.png")
     print("    - grafico_localizadores.png")
     print("    - grafico_modos_bandas.png")
     print("    - grafico_estaciones_top.png")
